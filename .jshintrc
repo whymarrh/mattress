@@ -10,6 +10,7 @@
 	"noempty": true,
 	"nonew": true,
 	"plusplus": true,
+	"quotmark": "double",
 	"trailing": true,
 	"undef": true,
 	"unused": "vars",
