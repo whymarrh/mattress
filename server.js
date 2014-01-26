@@ -1,24 +1,25 @@
 "use strict";
 
-var events = require("events");
 var http = require("http");
-var util = require("util");
 
-var EventEmitter = events.EventEmitter;
+var Router = require("./router");
 
-var Server = function (options) {
-	EventEmitter.call(this);
+var Server = function Server(options) {
+	var self = this;
+	this._router = new Router(options.routes || []);
 	this._server = http.createServer();
-	this._server.on("request", this._handleRequest);
+	this._server.on("request", function (request, response) {
+		self._handleRequest(request, response);
+	});
 };
-util.inherits(Server, EventEmitter);
 module.exports = Server;
 
 Server.prototype._handleRequest = function _handleRequest(request, response) {
-	console.log(request);
-	console.log(response);
-	response.writeHead(200, {"Content-Type": "text/plain"});
-	response.end("Works.\n");
+	if (!this._router.dispatch(request, response)) {
+		response.statusCode = 404;
+		response.end();
+	}
+	response.end("\n");
 };
 
 Server.prototype.listen = function listen() {

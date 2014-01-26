@@ -3,7 +3,7 @@
 var Server = require("./server");
 
 module.exports = {
-	"createServer": function (options) {
+	"createServer": function createServer(options) {
 		return new Server(options);
 	}
 };
