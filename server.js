@@ -46,7 +46,7 @@ Server.prototype._parseBasicAuthentication = function _parseBasicAuthentication(
 		}
 		catch (e) {
 			// Throw a 400
-			reject("Invalid hea=ader");
+			reject("Invalid header");
 		}
 		resolve(true);
 	});
