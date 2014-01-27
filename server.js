@@ -1,6 +1,7 @@
 "use strict";
 
 var http = require("http");
+var q = require("q");
 
 var Router = require("./router");
 
@@ -14,11 +15,54 @@ var Server = function Server(options) {
 };
 module.exports = Server;
 
+Server.prototype._parseBasicAuthentication = function _parseBasicAuthentication(request, response) {
+	var parseCredentials = function (credentials) {
+		var decoded = (new Buffer(credentials, "base64")).toString("utf-8");
+		if (!decoded) {
+			throw new Error();
+		}
+		var pieces = decoded.split(":");
+		if (pieces.length != 2) {
+			throw new Error();
+		}
+		return pieces;
+	};
+	return q.promise(function (resolve, reject) {
+		var authorization = request.headers.authorization;
+		if (!authorization) {
+			// Throw a 401
+			reject("Authorization required");
+		}
+		try {
+			var fields = authorization.split(" ");
+			if (!fields || fields.length != 2) {
+				throw new Error();
+			}
+			if (fields[0].toLowerCase() != "basic") {
+				// Unknown scheme
+				throw new Error();
+			}
+			request.basicAuthentication = parseCredentials(fields[1]);
+		}
+		catch (e) {
+			// Throw a 400
+			reject("Invalid hea=ader");
+		}
+		resolve(true);
+	});
+};
+
 Server.prototype._handleRequest = function _handleRequest(request, response) {
-	this._router.dispatch(request, response)
-	.done(function () {
+	var server = this;
+	server._parseBasicAuthentication(request, response)
+	.then(function () {
+		return server._router.dispatch(request, response);
+	})
+	.then(function () {
 		response.end();
-	}, function (error) {
+		return true;
+	})
+	.fail(function (error) {
 		response.statusCode = 404;
 		response.end(error + "\n");
 	});
