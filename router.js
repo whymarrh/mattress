@@ -1,5 +1,6 @@
 "use strict";
 
+var q = require("q");
 var url = require("url");
 
 var Router = function Router(routes) {
@@ -57,10 +58,10 @@ Router.prototype.dispatch = function dispatch(request, response) {
 			request.params = matches;
 			handler = this._routes[i].handlers[method];
 			if (handler) {
-				handler(request, response);
+				return handler(request, response);
 			}
-			return true;
+			return q.reject("Method not supported.");
 		}
 	}
-	return false;
+	return q.reject("No matching route.");
 };

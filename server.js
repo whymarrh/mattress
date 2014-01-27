@@ -15,11 +15,13 @@ var Server = function Server(options) {
 module.exports = Server;
 
 Server.prototype._handleRequest = function _handleRequest(request, response) {
-	if (!this._router.dispatch(request, response)) {
-		response.statusCode = 404;
+	this._router.dispatch(request, response)
+	.done(function () {
 		response.end();
-	}
-	response.end("\n");
+	}, function (error) {
+		response.statusCode = 404;
+		response.end(error + "\n");
+	});
 };
 
 Server.prototype.listen = function listen() {
