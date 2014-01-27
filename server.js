@@ -25,7 +25,10 @@ Server.prototype._parseBasicAuthentication = function _parseBasicAuthentication(
 		if (pieces.length != 2) {
 			throw new Error();
 		}
-		return pieces;
+		return {
+			"username": pieces[0],
+			"password": pieces[1]
+		};
 	};
 	return q.promise(function (resolve, reject) {
 		var authorization = request.headers.authorization;
