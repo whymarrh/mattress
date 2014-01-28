@@ -2,7 +2,6 @@
 
 var http = require("http");
 var q = require("q");
-
 var Router = require("./router");
 
 var Server = function Server(options) {
@@ -16,39 +15,45 @@ var Server = function Server(options) {
 module.exports = Server;
 
 Server.prototype._parseBasicAuthentication = function _parseBasicAuthentication(request, response) {
-	var parseCredentials = function (credentials) {
-		var decoded = (new Buffer(credentials, "base64")).toString("utf-8");
-		if (!decoded) {
-			throw new Error();
-		}
-		var pieces = decoded.split(":");
-		if (pieces.length != 2) {
-			throw new Error();
-		}
-		return {
-			"username": pieces[0],
-			"password": pieces[1]
-		};
-	};
 	return q.promise(function (resolve, reject) {
 		var authorization = request.headers.authorization;
+		var fields;
+		var pieces;
+		var index;
+		var decoded;
 		if (!authorization) {
-			// Throw a 401
+			// TODO: Throw a 401
 			reject("Authorization required");
 		}
 		try {
-			var fields = authorization.split(" ");
-			if (!fields || fields.length != 2) {
+			fields = authorization.split(" ", 2);
+			// fields[0] should be "Basic"
+			// fields[1] should be base64(sprintf("%s:%s", username, password))
+			if (
+				   !fields
+				|| fields.length != 2
+				|| fields[0].toLowerCase() != "basic"
+			) {
+				// Invalid header
+				// OR unknown scheme
 				throw new Error();
 			}
-			if (fields[0].toLowerCase() != "basic") {
-				// Unknown scheme
+			decoded = (new Buffer(fields[1], "base64")).toString("utf-8");
+			if (!decoded) {
 				throw new Error();
 			}
-			request.basicAuthentication = parseCredentials(fields[1]);
+			index = decoded.indexOf(":");
+			pieces = [decoded.slice(0, index), decoded.slice(index + 1)]; // [username, password]
+			if (!pieces[0] || !pieces[1]) {
+				throw new Error();
+			}
+			request.authentication = {
+				"username": pieces[0],
+				"password": pieces[1]
+			};
 		}
 		catch (e) {
-			// Throw a 400
+			// TODO: Throw a 400
 			reject("Invalid header");
 		}
 		resolve(true);
