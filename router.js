@@ -60,8 +60,10 @@ Router.prototype.dispatch = function dispatch(request, response) {
 			if (handler) {
 				return handler(request, response);
 			}
+			// TODO: Reject w/ error
 			return q.reject("Method not supported.");
 		}
 	}
+	// TODO: Reject w/ error
 	return q.reject("No matching route.");
 };
