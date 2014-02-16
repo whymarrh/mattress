@@ -13,6 +13,10 @@ var Server = function Server(options) {
 	this._server.on("request", function (request, response) {
 		self._handleRequest(request, response);
 	});
+	process.on("SIGINT", function () {
+		console.log(); // \n
+		self._server.close();
+	});
 };
 module.exports = Server;
 
