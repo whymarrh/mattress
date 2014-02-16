@@ -66,11 +66,30 @@ Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
 		var mediaType = parts[0].split("/");
 		var type = mediaType[0];
 		var subtype = mediaType[1];
-		var params = {};
+		var params = { "q": 1 }; // Default qvalue is 1
 		parts.slice(1).forEach(function (e, i, a) {
 			// Intentionally shadowing vars
 			var subparts = e.split("=");
-			params[subparts[0].trim()] = subparts[1] ? subparts[1].trim() : true;
+			var k, v;
+			var asNumber;
+			if (subparts[1]) {
+				// A value was given
+				v = subparts[1].trim();
+				asNumber = parseFloat(v);
+				if (isFinite(asNumber)) {
+					// The value is a number
+					v = asNumber;
+				}
+			} else {
+				// No value was given
+				v = true;
+			}
+			k = subparts[0].trim();
+			if (k == "q" && (!isFinite(v) || v < 0 || v > 1)) {
+				// The qvalue must be between 0 and 1
+				throw new Error();
+			}
+			params[k] = v;
 		});
 		return {
 			"type": type.trim(),
@@ -80,12 +99,38 @@ Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
 	});
 };
 
-Router.prototype._matchMedia = function _matchMedia(accepts, mediaTypes) {
+Router.prototype._matchMedia = function _matchMedia(accepts, media) {
 	// TODO: Determine best content type for response
-	return {
-		"media": "application/json",
-		"version": 1
-	};
+	var mm = false;
+	var isWildcard = RegExp.prototype.test.bind(/^[*]$/);
+	// Check each media type the client is willing to accept against
+	// what we are willing to provide and send back the first match (if
+	// one exists).
+	accepts
+	.sort(function compare(a, b) {
+		return b.params.q - a.params.q;
+	})
+	.some(function (accept, i, _accepts) {
+		var version = accept.params.version || accept.params.v; // Check for both params
+		return Object.keys(media).some(function (e, j, keys) {
+			// Does it match?
+			var parts = e.split("/");
+			if (parts.length != 2) {
+				// TODO: 500
+				throw new Error();
+			}
+			if (
+				   (isWildcard(accept.type) || parts[0] == accept.type)
+				&& (isWildcard(accept.subtype) || parts[1] == accept.subtype)
+				&& (version && media[e][version])
+				// Is `*/json` a valid media type?
+			) {
+				mm = { "media": e, "version": version };
+				return true;
+			}
+		});
+	});
+	return mm;
 };
 
 Router.prototype.dispatch = function dispatch(request, response) {
@@ -116,6 +161,7 @@ Router.prototype.dispatch = function dispatch(request, response) {
 			request.params = matches;
 			handler = route.media[mm.media][mm.version][method];
 			if (handler) {
+				response.setHeader("Content-Type", mm.media + "; version = " + mm.version + "; charset = utf-8");
 				return handler(request, response);
 			}
 			return q.reject(statuses.errors.METHOD_NOT_ALLOWED);
