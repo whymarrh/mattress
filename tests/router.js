@@ -11,3 +11,16 @@ exports.testValidAcceptHeader = function (test) {
 	}], results);
 	test.done();
 };
+
+exports.testValidAcceptHeaderWithParams = function (test) {
+	var results = Router.prototype._parseAcceptHeader("application/json;q=3;v=1");
+	test.deepEqual([{
+		"type": "application",
+		"subtype": "json",
+		"params": {
+			"q": "3",
+			"v": "1"
+		}
+	}], results);
+	test.done();
+};
