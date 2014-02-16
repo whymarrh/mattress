@@ -3,28 +3,28 @@
 module.exports = {
 	"errors": {
 		"BAD_REQUEST": {
-			"statusCode": 400,
-			"message": "Bad request"
+			"message": "Bad request",
+			"statusCode": 400
 		},
 		"UNAUTHORIZED": {
+			"message": "Unauthorized",
 			"statusCode": 401,
-			"message": "Unauthorized"
 		},
 		"NOT_FOUND": {
-			"statusCode": 404,
-			"message": "I do not know what you are looking for"
+			"message": "I do not know what you are looking for",
+			"statusCode": 404
 		},
 		"METHOD_NOT_ALLOWED": {
-			"statusCode": 405,
-			"message": "Method not allowed"
+			"message": "Method not allowed",
+			"statusCode": 405
 		},
 		"NOT_ACCEPTABLE": {
-			"statusCode": 406,
-			"message": "The specifed Accept header is not appropriate or is invalid"
+			"message": "The specifed Accept header is not appropriate or is invalid",
+			"statusCode": 406
 		},
 		"UNSUPPORTED_MEDIA_TYPE": {
-			"statusCode": 415,
-			"message": "The requested media types are not supported"
+			"message": "The requested media types are not supported",
+			"statusCode": 415
 		}
 	}
 };
