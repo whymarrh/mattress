@@ -32,10 +32,10 @@ Server.prototype._handleRequest = function _handleRequest(request, response) {
 		response.end();
 		return true;
 	})
-	.fail(function (error, message) {
+	.fail(function (error) {
 		// An error has occurred whilst handling the request
 		response.statusCode = error.statusCode;
-		response.end((message || error.message) + "\n");
+		response.end(error.message + "\n");
 	});
 };
 
