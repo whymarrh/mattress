@@ -2,6 +2,13 @@
 
 var Router = require("../router");
 
+exports.testCompileRegex = function (test) {
+	var compile = Router.prototype._compile;
+	test.equal(compile("/foo").toString(), "/^\/+foo$/");
+	test.equal(compile("/foo/bar").toString(), "/^\/+foo\/+bar$/");
+	test.done();
+};
+
 exports.testValidAcceptHeader = function (test) {
 	var results = Router.prototype._parseAcceptHeader("application/json");
 	test.deepEqual([{
