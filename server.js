@@ -29,12 +29,10 @@ Server.prototype._handleRequest = function _handleRequest(request, response) {
 	// Augment request
 	request.authentication = this._basicAuthentication(request);
 	// Handle
-	var server = this;
-	server._router.dispatch(request, response)
-	.then(function () {
-		// Request has been handled
+	this._router.dispatch(request, response)
+	.then(function (value) {
+		// The request has been handled
 		response.end();
-		return true;
 	})
 	.fail(function (error) {
 		// An error has occurred whilst handling the request
