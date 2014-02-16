@@ -6,8 +6,13 @@ module.exports = function (grunt) {
 	// JSHint
 	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.config("jshint", {
-		"options": {"jshintrc": true},
-		"all": ["*.js"]
+		"options": { "jshintrc": true },
+		"all": ["*.js", "tests/*.js"]
+	});
+
+	grunt.loadNpmTasks("grunt-contrib-nodeunit");
+	grunt.config("nodeunit", {
+		all: ["tests/*.js"]
 	});
 
 	// Default task
