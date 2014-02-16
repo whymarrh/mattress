@@ -3,11 +3,13 @@
 var q = require("q");
 var url = require("url");
 
+var statuses = require("./statuses");
+
 var Router = function Router(routes) {
 	var self = this;
 	this._routes = routes.map(function (e, i, a) {
 		return {
-			"handlers": e.handlers,
+			"media": e.media || {},
 			"path": e.path,
 			"regexp": self._compile(e.path)
 		};
@@ -47,23 +49,77 @@ Router.prototype._matches = function _matches(regexp, path) {
 	return params;
 };
 
+Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
+	// From RFC 2616, section 14.1 <https://tools.ietf.org/html/rfc2616#section-14.1>:
+	//
+	//     Accept         = "Accept" ":"
+	//                      #( media-range [ accept-params ] )
+	//     media-range    = ( "*/*"
+	//                      | ( type "/" "*" )
+	//                      | ( type "/" subtype )
+	//                      ) *( ";" parameter )
+	//     accept-params  = ";" "q" "=" qvalue *( accept-extension )
+	//     accept-extension = ";" token [ "=" ( token | quoted-string ) ]
+	//
+	return accept.split(",").map(function (e, i, a) {
+		var parts = e.split(";");
+		var mediaType = parts[0].split("/");
+		var type = mediaType[0];
+		var subtype = mediaType[1];
+		var params = {};
+		parts.slice(1).forEach(function (e, i, a) {
+			// Intentionally shadowing vars
+			var subparts = e.split("=");
+			params[subparts[0].trim()] = subparts[1] ? subparts[1].trim() : true;
+		});
+		return {
+			"type": type.trim(),
+			"subtype": subtype.trim(),
+			"params": params
+		};
+	});
+};
+
+Router.prototype._matchMedia = function _matchMedia(accepts, mediaTypes) {
+	// TODO: Determine best content type for response
+	return {
+		"media": "application/json",
+		"version": 1
+	}
+};
+
 Router.prototype.dispatch = function dispatch(request, response) {
-	var i = 0;
+	console.log("Dispatching a request");
+	try {
+		var accepts = this._parseAcceptHeader(request.headers.accept);
+	} catch (e) {
+		// The Accept header was invalid
+		return q.reject(statuses.errors.BAD_REQUEST);
+	}
 	var method = request.method.toLowerCase();
+	var route;
+	var mm; // Matching media
 	var matches;
 	var handler;
-	for (i = 0; i < this._routes.length; i += 1) {
+	var i, l;
+	for (i = 0, l = this._routes.length; i < l; ++i) {
 		matches = this._matches(this._routes[i].regexp, request.url);
 		if (matches) {
+			// We have a route that matches
+			// Is it the right media type?
+			route = this._routes[i];
+			mm = this._matchMedia(accepts, route.media);
+			if (!mm) {
+				// No matching media
+				return q.reject(statuses.errors.UNSUPPORTED_MEDIA_TYPE);
+			}
 			request.params = matches;
-			handler = this._routes[i].handlers[method];
+			handler = route.media[mm.media][mm.version][method];
 			if (handler) {
 				return handler(request, response);
 			}
-			// TODO: Reject w/ error
-			return q.reject("Method not supported.");
+			return q.reject(statuses.errors.METHOD_NOT_ALLOWED);
 		}
 	}
-	// TODO: Reject w/ error
-	return q.reject("No matching route.");
+	return q.reject(statuses.errors.NOT_FOUND); // No matching route
 };

@@ -2,7 +2,9 @@
 
 var http = require("http");
 var q = require("q");
+
 var Router = require("./router");
+var statuses = require("./statuses");
 
 var Server = function Server(options) {
 	var self = this;
@@ -14,16 +16,38 @@ var Server = function Server(options) {
 };
 module.exports = Server;
 
-Server.prototype._parseBasicAuthentication = function _parseBasicAuthentication(request, response) {
-	return q.promise(function (resolve, reject) {
+Server.prototype.listen = function listen() {
+	var args = Array.prototype.slice.call(arguments);
+	return this._server.listen.apply(this._server, args);
+};
+
+Server.prototype._handleRequest = function _handleRequest(request, response) {
+	// Augment request
+	request.authentication = this._basicAuthentication(request);
+	// Handle
+	var server = this;
+	server._router.dispatch(request, response)
+	.then(function () {
+		// Request has been handled
+		response.end();
+		return true;
+	})
+	.fail(function (error, message) {
+		// An error has occurred whilst handling the request
+		response.statusCode = error.statusCode;
+		response.end((message || error.message) + "\n");
+	});
+};
+
+Server.prototype._basicAuthentication = function _basicAuthentication(request) {
+	return function () {
 		var authorization = request.headers.authorization;
 		var fields;
 		var pieces;
 		var index;
 		var decoded;
 		if (!authorization) {
-			// TODO: Throw a 401
-			reject("Authorization required");
+			return q.reject(statuses.errors.UNAUTHORIZED);
 		}
 		try {
 			fields = authorization.split(" ", 2);
@@ -47,36 +71,10 @@ Server.prototype._parseBasicAuthentication = function _parseBasicAuthentication(
 			if (!pieces[0] || !pieces[1]) {
 				throw new Error();
 			}
-			request.authentication = {
-				"username": pieces[0],
-				"password": pieces[1]
-			};
 		}
 		catch (e) {
-			// TODO: Throw a 400
-			reject("Invalid header");
+			return q.reject(statuses.errors.BAD_REQUEST);
 		}
-		resolve(true);
-	});
-};
-
-Server.prototype._handleRequest = function _handleRequest(request, response) {
-	var server = this;
-	server._parseBasicAuthentication(request, response)
-	.then(function () {
-		return server._router.dispatch(request, response);
-	})
-	.then(function () {
-		response.end();
-		return true;
-	})
-	.fail(function (error) {
-		response.statusCode = 404;
-		response.end(error + "\n");
-	});
-};
-
-Server.prototype.listen = function listen() {
-	var args = Array.prototype.slice.call(arguments);
-	return this._server.listen.apply(this._server, args);
+		return q(pieces);
+	};
 };
