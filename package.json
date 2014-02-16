@@ -1,10 +1,11 @@
 {
-	"dependencies": {"q": "*"},
-	"description": "A web service API framework.",
-	"devDependencies": {
+	"dependencies": {
 		"grunt": "*",
-		"grunt-contrib-jshint": "*"
+		"grunt-contrib-jshint": "*",
+		"grunt-contrib-nodeunit": "*",
+		"q": "*"
 	},
+	"description": "A web service API framework.",
 	"main": "index.js",
 	"name": "rested",
 	"os": ["!win32"],

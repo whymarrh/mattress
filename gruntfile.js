@@ -6,8 +6,18 @@ module.exports = function (grunt) {
 	// JSHint
 	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.config("jshint", {
-		"options": {"jshintrc": true},
-		"all": ["*.js"]
+		"options": { "jshintrc": true },
+		"all": ["*.js", "tests/*.js"]
+	});
+
+	// Nodeunit
+	grunt.loadNpmTasks("grunt-contrib-nodeunit");
+	grunt.config("nodeunit", {
+		all: ["tests/*.js"],
+		options: {
+			reporter: "minimal",
+			reporterOptions: undefined // Use nodeunit default values
+		}
 	});
 
 	// Default task
@@ -15,4 +25,5 @@ module.exports = function (grunt) {
 	// Aliases
 	grunt.registerTask("hint", ["jshint"]);
 	grunt.registerTask("lint", ["jshint"]);
+	grunt.registerTask("test", ["nodeunit"]);
 };
