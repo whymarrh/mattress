@@ -10,6 +10,7 @@ module.exports = function (grunt) {
 		"all": ["*.js", "tests/*.js"]
 	});
 
+	// Nodeunit
 	grunt.loadNpmTasks("grunt-contrib-nodeunit");
 	grunt.config("nodeunit", {
 		all: ["tests/*.js"],
