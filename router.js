@@ -89,7 +89,6 @@ Router.prototype._matchMedia = function _matchMedia(accepts, mediaTypes) {
 };
 
 Router.prototype.dispatch = function dispatch(request, response) {
-	console.log("Dispatching a request");
 	var accepts;
 	try {
 		accepts = this._parseAcceptHeader(request.headers.accept);
