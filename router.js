@@ -161,6 +161,7 @@ Router.prototype.dispatch = function dispatch(request, response) {
 			request.params = matches;
 			handler = route.media[mm.media][mm.version][method];
 			if (handler) {
+				response.setHeader("Content-Type", mm.media + "; version = " + mm.version + "; charset = utf-8");
 				return handler(request, response);
 			}
 			return q.reject(statuses.errors.METHOD_NOT_ALLOWED);
