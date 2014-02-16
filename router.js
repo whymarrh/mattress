@@ -23,7 +23,7 @@ Router.prototype._compile = function _compile(path) {
 		if (c.length === 0) {
 			return p;
 		}
-		p += "\\/+";
+		p += "\/+";
 		if (c.charAt(0) == ":") {
 			params.push(c.substring(1));
 			return p + "([a-zA-Z0-9-_~\\.%@]+)";

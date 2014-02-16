@@ -14,20 +14,27 @@ exports.testValidAcceptHeader = function (test) {
 	test.deepEqual([{
 		"type": "application",
 		"subtype": "json",
-		"params": {}
+		"params": { "q": 1 }
 	}], results);
 	test.done();
 };
 
 exports.testValidAcceptHeaderWithParams = function (test) {
-	var results = Router.prototype._parseAcceptHeader("application/json;q=3;v=1");
+	var results = Router.prototype._parseAcceptHeader("application/json;q=0.5;v=1");
 	test.deepEqual([{
 		"type": "application",
 		"subtype": "json",
-		"params": {
-			"q": "3",
-			"v": "1"
-		}
+		"params": { "q": 0.5, "v": 1 }
 	}], results);
+	test.done();
+};
+
+exports.testValidAcceptHeaderWithInvalidQvalue = function (test) {
+	try {
+		Router.prototype._parseAcceptHeader("application/json;q=9;v=1");
+	} catch (e) {
+		test.ok(true);
+	}
+	test.expect(1);
 	test.done();
 };
