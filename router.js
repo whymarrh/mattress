@@ -110,10 +110,9 @@ Router.prototype._matchMedia = function _matchMedia(accepts, media) {
 	.sort(function compare(a, b) {
 		return b.params.q - a.params.q;
 	})
-	.forEach(function (accept, i, _accepts) {
+	.some(function (accept, i, _accepts) {
 		var version = accept.params.version || accept.params.v; // Check for both params
-		Object.keys(media)
-		.forEach(function (e, j, keys) {
+		return Object.keys(media).some(function (e, j, keys) {
 			// Does it match?
 			var parts = e.split("/");
 			if (parts.length != 2) {
@@ -127,6 +126,7 @@ Router.prototype._matchMedia = function _matchMedia(accepts, media) {
 				// Is `*/json` a valid media type?
 			) {
 				mm = { "media": e, "version": version };
+				return true;
 			}
 		});
 	});
