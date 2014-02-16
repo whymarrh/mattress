@@ -17,6 +17,14 @@ module.exports = {
 		"METHOD_NOT_ALLOWED": {
 			"statusCode": 405,
 			"message": "Method not allowed"
+		},
+		"NOT_ACCEPTABLE": {
+			"statusCode": 406,
+			"message": "The specifed Accept header is not appropriate or is invalid"
+		},
+		"UNSUPPORTED_MEDIA_TYPE": {
+			"statusCode": 415,
+			"message": "The requested media types are not supported"
 		}
 	}
 };
