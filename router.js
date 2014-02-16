@@ -85,13 +85,14 @@ Router.prototype._matchMedia = function _matchMedia(accepts, mediaTypes) {
 	return {
 		"media": "application/json",
 		"version": 1
-	}
+	};
 };
 
 Router.prototype.dispatch = function dispatch(request, response) {
 	console.log("Dispatching a request");
+	var accepts;
 	try {
-		var accepts = this._parseAcceptHeader(request.headers.accept);
+		accepts = this._parseAcceptHeader(request.headers.accept);
 	} catch (e) {
 		// The Accept header was invalid
 		return q.reject(statuses.errors.BAD_REQUEST);
@@ -102,7 +103,7 @@ Router.prototype.dispatch = function dispatch(request, response) {
 	var matches;
 	var handler;
 	var i, l;
-	for (i = 0, l = this._routes.length; i < l; ++i) {
+	for (i = 0, l = this._routes.length; i < l; i += 1) {
 		matches = this._matches(this._routes[i].regexp, request.url);
 		if (matches) {
 			// We have a route that matches
