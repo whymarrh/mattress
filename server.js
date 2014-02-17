@@ -47,6 +47,7 @@ Server.prototype._handleRequest = function _handleRequest(request, response) {
 	.fail(function (error) {
 		// An error has occurred whilst handling the request
 		response.statusCode = error.statusCode;
+		response.setHeader("Content-Type", "application/json; charset = utf-8");
 		response.end(JSON.stringify(error) + "\n");
 	});
 };
