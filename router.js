@@ -87,7 +87,7 @@ Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
 			k = subparts[0].trim();
 			if (k == "q" && (!isFinite(v) || v < 0 || v > 1)) {
 				// The qvalue must be between 0 and 1
-				throw new Error();
+				throw statuses.errors.BAD_REQUEST;
 			}
 			params[k] = v;
 		});
@@ -116,8 +116,7 @@ Router.prototype._matchMedia = function _matchMedia(accepts, media) {
 			// Does it match?
 			var parts = e.split("/");
 			if (parts.length != 2) {
-				// TODO: 500
-				throw new Error();
+				throw statuses.errors.INTERNAL_SERVER_ERROR;
 			}
 			if (
 				   (isWildcard(accept.type) || parts[0] == accept.type)
@@ -134,13 +133,7 @@ Router.prototype._matchMedia = function _matchMedia(accepts, media) {
 };
 
 Router.prototype.dispatch = function dispatch(request, response) {
-	var accepts;
-	try {
-		accepts = this._parseAcceptHeader(request.headers.accept);
-	} catch (e) {
-		// The Accept header was invalid
-		return q.reject(statuses.errors.BAD_REQUEST);
-	}
+	var accepts = this._parseAcceptHeader(request.headers.accept);
 	var method = request.method.toLowerCase();
 	var route;
 	var mm; // Matching media
