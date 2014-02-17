@@ -47,7 +47,8 @@ Server.prototype._handleRequest = function _handleRequest(request, response) {
 	.fail(function (error) {
 		// An error has occurred whilst handling the request
 		response.statusCode = error.statusCode;
-		response.end(error.message + "\n");
+		response.setHeader("Content-Type", "application/json; charset = utf-8");
+		response.end(JSON.stringify(error) + "\n");
 	});
 };
 
@@ -61,30 +62,25 @@ Server.prototype._basicAuthentication = function _basicAuthentication(request) {
 		if (!authorization) {
 			return q.reject(statuses.errors.UNAUTHORIZED);
 		}
-		try {
-			fields = authorization.split(" ", 2);
-			// fields[0] should be "Basic"
-			// fields[1] should be base64(sprintf("%s:%s", username, password))
-			if (
-				   !fields
-				|| fields.length != 2
-				|| fields[0].toLowerCase() != "basic"
-			) {
-				// Invalid header
-				// OR unknown scheme
-				throw new Error();
-			}
-			decoded = (new Buffer(fields[1], "base64")).toString("utf-8");
-			if (!decoded) {
-				throw new Error();
-			}
-			index = decoded.indexOf(":");
-			pieces = [decoded.slice(0, index), decoded.slice(index + 1)]; // [username, password]
-			if (!pieces[0] || !pieces[1]) {
-				throw new Error();
-			}
+		fields = authorization.split(" ", 2);
+		// fields[0] should be "Basic"
+		// fields[1] should be base64(sprintf("%s:%s", username, password))
+		if (
+			   !fields
+			|| fields.length != 2
+			|| fields[0].toLowerCase() != "basic"
+		) {
+			// Invalid header
+			// OR unknown scheme
+			return q.reject(statuses.errors.BAD_REQUEST);
 		}
-		catch (e) {
+		decoded = (new Buffer(fields[1], "base64")).toString("utf-8");
+		if (!decoded) {
+			return q.reject(statuses.errors.BAD_REQUEST);
+		}
+		index = decoded.indexOf(":");
+		pieces = [decoded.slice(0, index), decoded.slice(index + 1)]; // [username, password]
+		if (!pieces[0] || !pieces[1]) {
 			return q.reject(statuses.errors.BAD_REQUEST);
 		}
 		return q(pieces);
