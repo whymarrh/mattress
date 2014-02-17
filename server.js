@@ -1,6 +1,7 @@
 "use strict";
 
 var http = require("http");
+var https = require("https");
 var q = require("q");
 
 var Router = require("./router");
@@ -9,7 +10,16 @@ var statuses = require("./statuses");
 var Server = function Server(options) {
 	var self = this;
 	this._router = new Router(options.routes || []);
-	this._server = http.createServer();
+	if (options.secure) {
+		// HTTP over TLS
+		this._server = https.createServer({
+			"cert": options.certificate || options.cert || options.crt,
+			"key": options.key
+		});
+	} else {
+		// Plain ol' HTTP
+		this._server = http.createServer();
+	}
 	this._server.on("request", function (request, response) {
 		self._handleRequest(request, response);
 	});
