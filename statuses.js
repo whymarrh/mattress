@@ -25,6 +25,10 @@ module.exports = {
 		"UNSUPPORTED_MEDIA_TYPE": {
 			"message": "The requested media types are not supported",
 			"statusCode": 415
+		},
+		"INTERNAL_SERVER_ERROR": {
+			"message": "The server broke",
+			"statusCode": 500
 		}
 	}
 };
