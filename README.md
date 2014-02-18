@@ -1,9 +1,73 @@
-rested
+Rested
 ======
 
-A web service API framework for Node.js based on [restify](https://github.com/mcavage/node-restify).
+Rested is a framework, a foundation if you will, on top of which you can build APIs. Rested is not a web framework, it is an API framework. It was/is based on [restify] and borrows heavily from it, but differs from it in some aspects. Despite it's name, Rested will automatically create REST APIs for you &mdash; whether your API is actually RESTful depends on a lot of things outside of the control of any framework (e.g. defining the relationships between your resources).
+
+Got ideas and/or feature requests? [Please file and issue.](https://github.com/whymarrh/rested/issues)
+
+Features
+--------
+
+- Content negoitation
+- Basic Authentication
+- Route versioning
+- HTTP and HTTP over TLS (HTTPS) support
+
+Niceties: Rested is built using [Promises].
+
+Quick start
+-----------
+
+A server that simply echos "Hello world." (available as [examples/hello-world.js](examples/hello-world.js)):
+
+```js
+var Rested = require("rested");
+var q = require("q");
+
+var v1 = {
+    "get": function (request, response) {
+        response.write("Hello world.\n");
+        return q(true);
+    }
+};
+
+var media = {
+    "text/plain": { 1: v1 }
+};
+
+Rested.createServer({
+    "routes": [{
+        "path": "/hello",
+        "media": media
+    }]
+})
+.listen(8888, function () {
+    console.log("Server listening on port 8888");
+});
+```
+
+Running:
+
+```bash
+$ curl -i localhost:8888/hello -H "Accept: text/plain; v = 1"
+```
+
+Will output:
+
+```
+HTTP/1.1 200 OK
+Content-Type: text/plain; version = 1; charset = utf-8
+Date: Tue, 18 Feb 2014 03:07:07 GMT
+Connection: keep-alive
+Transfer-Encoding: chunked
+
+Hello world.
+```
 
 License
 -------
 
 This software is released under the BSD 3-Clause License. See [LICENSE.md](LICENSE.md) for more information.
+
+  [restify]:https://github.com/mcavage/node-restify
+  [promises]:http://promisesaplus.com/
