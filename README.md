@@ -1,12 +1,14 @@
 Rested
 ======
 
-Rested is a framework, a foundation if you will, on top of which you can build APIs. Rested is not a web framework, it is an API framework. It was/is based on [restify] and borrows heavily from it, but differs from it in some aspects. Despite it's name, Rested will automatically create REST APIs for you &mdash; whether your API is actually RESTful depends on a lot of things outside of the control of any framework (e.g. defining the relationships between your resources).
+Rested is a small framework, a foundation if you will, on top of which you can build APIs. Rested is not a web framework, it is an API framework. It was/is based on [restify] and borrows heavily from it, but differs in some aspects. Despite it's name, Rested will automatically create REST APIs for you &mdash; whether your API is actually RESTful depends on you.
 
 Got ideas and/or feature requests? [Please file and issue.](https://github.com/whymarrh/rested/issues)
 
-Features
---------
+Things Rested will do
+---------------------
+
+a.k.a features!
 
 - Content negoitation
 - Basic Authentication
@@ -35,7 +37,8 @@ var media = {
     "text/plain": { 1: v1 }
 };
 
-Rested.createServer({
+Rested
+.createServer({
     "routes": [{
         "path": "/hello",
         "media": media

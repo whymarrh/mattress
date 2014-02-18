@@ -1,6 +1,5 @@
 "use strict";
 
-var port = process.env.PORT || 8888;
 var Rested = require("..");
 var q = require("q");
 
@@ -22,6 +21,6 @@ Rested
 		"media": media
 	}]
 })
-.listen(port, function () {
-	console.log("Server listening on port " + port);
+.listen(8888, function () {
+	console.log("Server listening on port 8888");
 });
