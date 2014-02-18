@@ -14,10 +14,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-contrib-nodeunit");
 	grunt.config("nodeunit", {
 		all: ["tests/*.js"],
-		options: {
-			reporter: "minimal",
-			reporterOptions: undefined // Use nodeunit default values
-		}
+		options: { reporter: "minimal" }
 	});
 
 	// Default task
