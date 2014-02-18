@@ -5,8 +5,8 @@ Rested is a small framework, a foundation if you will, on top of which you can b
 
 Got ideas and/or feature requests? [Please file and issue.](https://github.com/whymarrh/rested/issues)
 
-Things Rested will do
----------------------
+Things Rested does
+------------------
 
 a.k.a features!
 
