@@ -25,5 +25,5 @@ module.exports = function (grunt) {
 	// Aliases
 	grunt.registerTask("hint", ["jshint"]);
 	grunt.registerTask("lint", ["jshint"]);
-	grunt.registerTask("test", ["nodeunit"]);
+	grunt.registerTask("test", ["jshint", "nodeunit"]);
 };
