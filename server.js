@@ -9,9 +9,9 @@ var statuses = require("./statuses");
 
 var Server = function Server(options) {
 	var self = this;
+	this._headers = options.headers || {};
 	this._router = new Router(options.routes || []);
-	this._handlers = [];
-	if (options.secure) {
+	if (options.secure === true) {
 		// HTTP over TLS
 		this._server = https.createServer({
 			"cert": options.certificate || options.cert || options.crt,
@@ -29,40 +29,31 @@ var Server = function Server(options) {
 		self._server.close();
 	});
 };
-module.exports = Server;
 
 Server.prototype.listen = function listen() {
 	var args = Array.prototype.slice.call(arguments);
 	return this._server.listen.apply(this._server, args);
 };
 
-Server.prototype.eachRequest = function eachRequest(fn) {
-	this._handlers.push(fn);
-};
-
 Server.prototype._handleRequest = function _handleRequest(request, response) {
 	// Augment request
 	request.authentication = this._basicAuthentication(request);
-	// Handle
-	var i = 0, l = this._handlers.length;
-	var handlers = this._handlers;
+	// Set headers
+	this._headers.forEach(function (e, i, a) {
+		if (e.k && e.v) {
+			response.setHeader(e.k, e.v);
+		}
+	});
+	// Handle request
 	this._router.dispatch(request, response)
 	.then(function (value) {
 		// The request has been handled
-		// Run each additional handler
-		for (i = 0; i < l; i += 1) {
-			handlers[i](request, response);
-		}
 		response.end();
 	})
 	.fail(function (error) {
 		// An error has occurred whilst handling the request
 		response.statusCode = error.statusCode;
 		response.setHeader("Content-Type", "application/json; charset = utf-8");
-		// Run each additional handler
-		for (i = 0; i < l; i += 1) {
-			handlers[i](request, response);
-		}
 		response.end(JSON.stringify(error) + "\n");
 	});
 };
@@ -101,3 +92,5 @@ Server.prototype._basicAuthentication = function _basicAuthentication(request) {
 		return q(pieces);
 	};
 };
+
+module.exports = Server;
