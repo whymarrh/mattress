@@ -9,7 +9,7 @@ var statuses = require("./statuses");
 
 var Server = function Server(options) {
 	var self = this;
-	this._headers = options.headers || {};
+	this._headers = options.headers || [];
 	this._router = new Router(options.routes || []);
 	if (options.secure === true) {
 		// HTTP over TLS
