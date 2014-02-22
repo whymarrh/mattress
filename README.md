@@ -1,7 +1,7 @@
 Rested [![Build Status](https://travis-ci.org/whymarrh/rested.png)](https://travis-ci.org/whymarrh/rested)
 ======
 
-Rested is a small framework, a foundation if you will, on top of which you can build APIs. Rested is not a web framework, it is an API framework. It was/is based on [restify] and borrows heavily from it, but differs in some aspects. Despite it's name, Rested not will automatically create REST APIs for you &mdash; whether your API is actually RESTful depends on you.
+Rested is a small framework, a foundation if you will, on top of which you can build APIs. Rested is not a web framework, it is an API framework. It was/is based on [restify] and borrows heavily from it, but differs in some aspects. Despite it's name, Rested not will automatically create REST APIs for you &mdash; whether or not your API is actually RESTful depends on you.
 
 Got ideas and/or feature requests? [Please file and issue.](https://github.com/whymarrh/rested/issues)
 
@@ -11,9 +11,9 @@ Things Rested does
 a.k.a features!
 
 - Content negoitation
-- Basic Authentication
-- Route versioning
-- HTTP and HTTP over TLS (HTTPS) support
+- HTTP and HTTPS
+- HTTP Basic Authentication
+- Versioned routes
 
 Niceties: Rested is built using [Promises].
 
