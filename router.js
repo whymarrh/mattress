@@ -15,7 +15,6 @@ var Router = function Router(routes) {
 		};
 	});
 };
-module.exports = Router;
 
 Router.prototype._compile = function _compile(path) {
 	var params = [];
@@ -162,3 +161,5 @@ Router.prototype.dispatch = function dispatch(request, response) {
 	}
 	return q.reject(statuses.errors.NOT_FOUND); // No matching route
 };
+
+module.exports = Router;
