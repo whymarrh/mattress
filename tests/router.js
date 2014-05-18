@@ -38,3 +38,36 @@ exports.testValidAcceptHeaderWithInvalidQvalue = function (test) {
 	test.expect(1);
 	test.done();
 };
+
+exports.dispatch = {
+	setUp: function (callback) {
+		this.mockResponse = {
+			setHeader: function () {
+				// Do nothing
+			}
+		};
+		callback();
+	},
+	testDispatchValidRequest: function (test) {
+		var router = new Router([{
+			"path": "/t",
+			"media": {
+				"text/html": {
+					1: {
+						"get":
+							function () {
+								test.done();
+							}
+					}
+				}
+			}
+		}]);
+		router.dispatch({
+			"method": "GET",
+			"url": "/t",
+			"headers": {
+				"accept": "text/html;v=1"
+			}
+		}, this.mockResponse);
+	}
+};
