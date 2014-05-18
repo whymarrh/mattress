@@ -1,6 +1,7 @@
 "use strict";
 
 var Router = require("../router");
+var statuses = require("../statuses.js");
 
 exports.testCompileRegex = function (test) {
 	var compile = Router.prototype._compile;
@@ -37,4 +38,62 @@ exports.testValidAcceptHeaderWithInvalidQvalue = function (test) {
 	}
 	test.expect(1);
 	test.done();
+};
+
+exports.dispatch = {
+	setUp: function (callback) {
+		this.mockResponse = {
+			setHeader: function () {
+				// Do nothing
+			}
+		};
+		callback();
+	},
+	testDispatchValidRequest: function (test) {
+		var router = new Router([{
+			"path": "/t",
+			"media": {
+				"text/html": {
+					1: {
+						"get":
+							function () {
+								test.done();
+							}
+					}
+				}
+			}
+		}]);
+		router.dispatch({
+			"method": "GET",
+			"url": "/t",
+			"headers": {
+				"accept": "text/html;v=1"
+			}
+		}, this.mockResponse);
+	},
+	testDispatchWithoutAcceptHeader: function (test) {
+		var router = new Router([{
+			"path": "/t",
+			"media": {
+				"text/html": {
+					1: {
+						"get":
+							function () {
+								// Do nothing
+							}
+					}
+				}
+			}
+		}]);
+		try {
+			router.dispatch({
+				"method": "GET",
+				"url": "/t",
+				"headers": {}
+			}, this.mockResponse);
+		} catch (e) {
+			test.deepEqual(statuses.errors.NOT_ACCEPTABLE, e);
+			test.done();
+		}
+	}
 };

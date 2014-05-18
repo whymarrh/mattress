@@ -49,6 +49,9 @@ Router.prototype._matches = function _matches(regexp, path) {
 };
 
 Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
+	if (!accept) {
+		throw statuses.errors.NOT_ACCEPTABLE;
+	}
 	// From RFC 2616, section 14.1 <https://tools.ietf.org/html/rfc2616#section-14.1>:
 	//
 	//     Accept         = "Accept" ":"
