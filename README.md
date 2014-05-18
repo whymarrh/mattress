@@ -67,6 +67,13 @@ Transfer-Encoding: chunked
 Hello world.
 ```
 
+Running tests
+-------------
+
+```bash
+$ grunt test
+```
+
 License
 -------
 
