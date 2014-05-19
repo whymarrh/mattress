@@ -1,9 +1,8 @@
 "use strict";
 
-var q = require("q");
 var url = require("url");
 
-var statuses = require("./statuses");
+var Status = require("./status");
 
 var Router = function Router(routes) {
 	var self = this;
@@ -50,7 +49,7 @@ Router.prototype._matches = function _matches(regexp, path) {
 
 Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
 	if (!accept) {
-		throw statuses.errors.NOT_ACCEPTABLE;
+		throw Status.client.NOT_ACCEPTABLE;
 	}
 	// From RFC 2616, section 14.1 <https://tools.ietf.org/html/rfc2616#section-14.1>:
 	//
@@ -70,7 +69,6 @@ Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
 		var subtype = mediaType[1];
 		var params = { "q": 1 }; // Default qvalue is 1
 		parts.slice(1).forEach(function (e, i, a) {
-			// Intentionally shadowing vars
 			var subparts = e.split("=");
 			var k, v;
 			var asNumber;
@@ -89,7 +87,7 @@ Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
 			k = subparts[0].trim();
 			if (k == "q" && (!isFinite(v) || v < 0 || v > 1)) {
 				// The qvalue must be between 0 and 1
-				throw statuses.errors.BAD_REQUEST;
+				throw Status.client.BAD_REQUEST;
 			}
 			params[k] = v;
 		});
@@ -102,12 +100,10 @@ Router.prototype._parseAcceptHeader = function _parseAcceptHeader(accept) {
 };
 
 Router.prototype._matchMedia = function _matchMedia(accepts, media) {
-	// TODO: Determine best content type for response
 	var mm = false;
 	var isWildcard = RegExp.prototype.test.bind(/^[*]$/);
-	// Check each media type the client is willing to accept against
-	// what we are willing to provide and send back the first match (if
-	// one exists).
+	// Check each media type the client is willing to accept against what we
+	// are willing to provide and send back the best match (if one exists).
 	accepts
 	.sort(function compare(a, b) {
 		return b.params.q - a.params.q;
@@ -118,7 +114,7 @@ Router.prototype._matchMedia = function _matchMedia(accepts, media) {
 			// Does it match?
 			var parts = e.split("/");
 			if (parts.length != 2) {
-				throw statuses.errors.INTERNAL_SERVER_ERROR;
+				throw Status.server.INTERNAL_SERVER_ERROR;
 			}
 			if (
 				   (isWildcard(accept.type) || parts[0] == accept.type)
@@ -136,7 +132,6 @@ Router.prototype._matchMedia = function _matchMedia(accepts, media) {
 
 Router.prototype.dispatch = function dispatch(request, response) {
 	var accepts = this._parseAcceptHeader(request.headers.accept);
-	var method = request.method.toLowerCase();
 	var route;
 	var mm; // Matching media
 	var matches;
@@ -151,18 +146,22 @@ Router.prototype.dispatch = function dispatch(request, response) {
 			mm = this._matchMedia(accepts, route.media);
 			if (!mm) {
 				// No matching media
-				return q.reject(statuses.errors.UNSUPPORTED_MEDIA_TYPE);
+				throw Status.client.NOT_ACCEPTABLE;
 			}
 			request.params = matches;
-			handler = route.media[mm.media][mm.version][method];
+			handler = route.media[mm.media][mm.version][request.method];
 			if (handler) {
-				response.setHeader("Content-Type", mm.media + "; version = " + mm.version + "; charset = utf-8");
+				response.setHeader(
+					"Content-Type",
+					mm.media + "; version = " + mm.version + "; charset = utf-8"
+				);
 				return handler(request, response);
 			}
-			return q.reject(statuses.errors.METHOD_NOT_ALLOWED);
+			throw Status.client.METHOD_NOT_ALLOWED;
 		}
 	}
-	return q.reject(statuses.errors.NOT_FOUND); // No matching route
+	// No matching route
+	throw Status.client.NOT_FOUND;
 };
 
 module.exports = Router;

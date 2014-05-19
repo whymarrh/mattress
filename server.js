@@ -2,10 +2,9 @@
 
 var http = require("http");
 var https = require("https");
-var q = require("q");
 
 var Router = require("./router");
-var statuses = require("./statuses");
+var Status = require("./status");
 
 var Server = function Server(options) {
 	var self = this;
@@ -25,7 +24,7 @@ var Server = function Server(options) {
 		self._handleRequest(request, response);
 	});
 	process.on("SIGINT", function () {
-		console.log(); // \n
+		console.log();
 		self._server.close();
 	});
 };
@@ -37,7 +36,7 @@ Server.prototype.listen = function listen() {
 
 Server.prototype._handleRequest = function _handleRequest(request, response) {
 	// Augment request
-	request.authentication = this._basicAuthentication(request);
+	request.authentication = this._basicAuthentication.bind(request.headers.authorization);
 	// Set headers
 	this._headers.forEach(function (e, i, a) {
 		if (e.k && e.v) {
@@ -45,52 +44,47 @@ Server.prototype._handleRequest = function _handleRequest(request, response) {
 		}
 	});
 	// Handle request
-	this._router.dispatch(request, response)
-	.then(function (value) {
-		// The request has been handled
-		response.end();
-	})
-	.fail(function (error) {
-		// An error has occurred whilst handling the request
-		response.statusCode = error.statusCode;
+	try {
+		this._router.dispatch(request, response);
+	} catch (e) {
+		response.statusCode = e.statusCode;
 		response.setHeader("Content-Type", "application/json; charset = utf-8");
-		response.end(JSON.stringify(error) + "\n");
-	});
+		response.end(JSON.stringify(e) + "\n");
+	}
 };
 
-Server.prototype._basicAuthentication = function _basicAuthentication(request) {
-	return function () {
-		var authorization = request.headers.authorization;
-		var fields;
-		var pieces;
-		var index;
-		var decoded;
-		if (!authorization) {
-			return q.reject(statuses.errors.UNAUTHORIZED);
-		}
-		fields = authorization.split(" ", 2);
-		// fields[0] should be "Basic"
-		// fields[1] should be base64(sprintf("%s:%s", username, password))
-		if (
-			   !fields
-			|| fields.length != 2
-			|| fields[0].toLowerCase() != "basic"
-		) {
-			// Invalid header
-			// OR unknown scheme
-			return q.reject(statuses.errors.BAD_REQUEST);
-		}
-		decoded = (new Buffer(fields[1], "base64")).toString("utf-8");
-		if (!decoded) {
-			return q.reject(statuses.errors.BAD_REQUEST);
-		}
-		index = decoded.indexOf(":");
-		pieces = [decoded.slice(0, index), decoded.slice(index + 1)]; // [username, password]
-		if (!pieces[0] || !pieces[1]) {
-			return q.reject(statuses.errors.BAD_REQUEST);
-		}
-		return q(pieces);
-	};
+Server.prototype._basicAuthentication = function _basicAuthentication(authorization) {
+	if (!authorization) {
+		throw Status.client.UNAUTHORIZED;
+	}
+	var fields;
+	var pieces;
+	var index;
+	var decoded;
+	fields = authorization.split(" ", 2);
+	// fields[0] should be "Basic"
+	// fields[1] should be base64(sprintf("%s:%s", username, password))
+	if (
+		   !fields
+		|| fields.length != 2
+		|| fields[0].toLowerCase() != "basic"
+	) {
+		// Invalid header or unknown scheme
+		throw Status.client.BAD_REQUEST;
+	}
+	decoded = (new Buffer(fields[1], "base64")).toString("utf-8");
+	if (!decoded) {
+		throw Status.client.BAD_REQUEST;
+	}
+	index = decoded.indexOf(":");
+	if (index < 0) {
+		throw Status.client.BAD_REQUEST;
+	}
+	pieces = [decoded.slice(0, index), decoded.slice(index + 1)]; // [username, password]
+	if (!pieces[0] || !pieces[1]) {
+		throw Status.client.BAD_REQUEST;
+	}
+	return pieces;
 };
 
 module.exports = Server;

@@ -15,26 +15,26 @@ a.k.a features!
 - HTTP Basic Authentication
 - Versioned routes
 
-Niceties: Rested is built using [Promises].
-
 Quick start
 -----------
 
 A server that simply echos "Hello world." (available as [examples/hello-world.js](examples/hello-world.js)):
 
 ```js
-var Rested = require("rested");
-var q = require("q");
+"use strict";
+
+var Rested = require("..");
 
 var v1 = {
-    "get": function (request, response) {
-        response.write("Hello world.\n");
-        return q(true);
-    }
+    "GET":
+        function GET(request, response) {
+            response.write("Hello world.\n");
+            response.end();
+        }
 };
 
 var media = {
-    "text/plain": { 1: v1 }
+    "text/plain": { "1": v1 }
 };
 
 Rested
@@ -73,4 +73,3 @@ License
 This software is released under the BSD 3-Clause License. See [LICENSE.md](LICENSE.md) for more information.
 
   [restify]:https://github.com/mcavage/node-restify
-  [promises]:http://promisesaplus.com/

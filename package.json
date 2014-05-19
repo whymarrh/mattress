@@ -1,15 +1,14 @@
 {
-	"dependencies": {
+	"description": "A web service API framework.",
+	"devDependencies": {
 		"grunt": "*",
 		"grunt-contrib-jshint": "*",
-		"grunt-contrib-nodeunit": "*",
-		"q": "*"
+		"grunt-contrib-nodeunit": "*"
 	},
-	"description": "A web service API framework.",
 	"main": "index.js",
 	"name": "rested",
 	"os": ["!win32"],
 	"private": true,
-	"repository": {"git": "git://github.com/whymarrh/rested"},
+	"repository": { "git": "git://github.com/whymarrh/rested" },
 	"version": "0.1.7"
 }

@@ -1,17 +1,17 @@
 "use strict";
 
 var Rested = require("..");
-var q = require("q");
 
 var v1 = {
-	"get": function (request, response) {
-		response.write("Hello world.\n");
-		return q(true);
-	}
+	"GET":
+		function GET(request, response) {
+			response.write("Hello world.\n");
+			response.end();
+		}
 };
 
 var media = {
-	"text/plain": { 1: v1 }
+	"text/plain": { "1": v1 }
 };
 
 Rested
