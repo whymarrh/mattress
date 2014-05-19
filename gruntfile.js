@@ -7,14 +7,18 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.config("jshint", {
 		"all": ["*.js", "tests/*.js", "examples/*.js"],
-		"options": { "jshintrc": true }
+		"options": {
+			"jshintrc": true
+		}
 	});
 
 	// Nodeunit
 	grunt.loadNpmTasks("grunt-contrib-nodeunit");
 	grunt.config("nodeunit", {
 		"all": ["tests/*.js"],
-		"options": { reporter: "minimal" }
+		"options": {
+			"reporter": "minimal"
+		}
 	});
 
 	// Default task
