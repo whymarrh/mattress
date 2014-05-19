@@ -10,6 +10,6 @@
 	"os": ["!win32"],
 	"private": true,
 	"repository": { "git": "git://github.com/whymarrh/rested" },
-	"scripts": {"test": "grunt test"},
+	"scripts": { "test": "grunt test" },
 	"version": "0.2.0"
 }
