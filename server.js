@@ -34,7 +34,7 @@ Server.prototype.listen = function listen() {
 
 Server.prototype._handleRequest = function _handleRequest(request, response) {
 	// Augment request
-	request.authentication = this._basicAuthentication.bind(this, request.headers.authorization);
+	request.authenticate = this._basicAuthentication.bind(this, request.headers.authorization);
 	// Set headers
 	this._headers.forEach(function (e, i, a) {
 		if (e.k && e.v) {
