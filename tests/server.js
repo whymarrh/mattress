@@ -1,43 +1,47 @@
 "use strict";
 
 var Server = require("../server");
+var Status = require("../status");
 
-exports.testMissingAuthorizationHeader = function (test) {
-	var parser = Server.prototype._basicAuthentication({
-		"headers": {}
-	});
-	parser().fail(function (err) {
-		test.equal(401, err.statusCode);
+exports._basicAuthentication = {
+	"setUp": function setUp(callback) {
+		callback();
+	},
+	"testUndefined": function testUndefined(test) {
+		try {
+			Server.prototype._basicAuthentication();
+		} catch (e) {
+			test.deepEqual(e, Status.client.UNAUTHORIZED);
+			test.done();
+		}
+	},
+	"testValidHeader": function testValidHeader(test) {
+		var parts = Server.prototype._basicAuthentication("Basic Zm9vOmJhcg==");
+		test.deepEqual(parts, ["foo", "bar"]);
 		test.done();
-	});
-};
-
-exports.testValidAuthorizationHeader = function (test) {
-	var parser = Server.prototype._basicAuthentication({
-		"headers": { "authorization": "Basic Zm9vOmJhcg==" }
-	});
-	parser().then(function (result) {
-		test.deepEqual(["foo", "bar"], result);
-		test.done();
-	});
-};
-
-exports.testBlatantlyWrongAuthorizationHeader = function (test) {
-	var parser = Server.prototype._basicAuthentication({
-		"headers": { "authorization": "What the heck is this" }
-	});
-	parser().fail(function (err) {
-		test.equal(400, err.statusCode);
-		test.done();
-	});
-};
-
-exports.testInvalidAuthorizationHeader = function (test) {
-	var parser = Server.prototype._basicAuthentication({
-		"headers": { "authorization": "Derp Zm9vOmJhcg==" }
-	});
-	parser().fail(function (err) {
-		test.equal(400, err.statusCode);
-		test.done();
-	});
+	},
+	"testBlatantlyIncorrectHeader": function testBlatantlyIncorrectHeader(test) {
+		try {
+			Server.prototype._basicAuthentication("What the heck is this?");
+		} catch (e) {
+			test.deepEqual(e, Status.client.BAD_REQUEST);
+			test.done();
+		}
+	},
+	"testInvalidScheme": function testInvalidScheme(test) {
+		try {
+			Server.prototype._basicAuthentication("Derp Zm9vOmJhcg==");
+		} catch (e) {
+			test.deepEqual(e, Status.client.BAD_REQUEST);
+			test.done();
+		}
+	},
+	"testMalformedCredentials": function testMalformedCredentials(test) {
+		try {
+			Server.prototype._basicAuthentication("Basic d2F0Cg==");
+		} catch (e) {
+			test.deepEqual(e, Status.client.BAD_REQUEST);
+			test.done();
+		}
+	}
 };
