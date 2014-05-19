@@ -68,20 +68,16 @@ exports.dispatch = {
 		router.dispatch({
 			"method": "GET",
 			"url": "/t",
-			"headers": {
-				"accept": "text/html;v=1"
-			}
+			"headers": { "accept": "text/html;v=1" }
 		}, this.mockResponse);
 	},
 	testDispatchRequestWithNoMatchingMedia: function (test) {
-		var router = new Router([{"path": "/t"}]);
+		var router = new Router([{ "path": "/t" }]);
 		try {
 			router.dispatch({
 				"method": "GET",
 				"url": "/t",
-				"headers": {
-					"accept": "text/html;v=1"
-				}
+				"headers": { "accept": "text/html;v=1" }
 			}, this.mockResponse);
 		} catch (e) {
 			test.deepEqual(e, Status.client.NOT_ACCEPTABLE);
