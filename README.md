@@ -77,6 +77,6 @@ $ grunt test
 License
 -------
 
-This software is released under the BSD 3-Clause License. See [LICENSE.md](LICENSE.md) for more information.
+This software is released under the ISC License. See [LICENSE.md](LICENSE.md) for more information.
 
   [restify]:https://github.com/mcavage/node-restify
