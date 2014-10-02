@@ -1,0 +1,13 @@
+.gitattributes
+.gitignore
+.jshintrc
+.travis-yml
+
+examples/
+tests/
+
+gruntfile.js
+npm-debug.log
+
+# Don't ignore .npmignore files
+!.npmignore
