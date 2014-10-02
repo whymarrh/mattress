@@ -6,10 +6,19 @@
 		"grunt-contrib-nodeunit": "*"
 	},
 	"main": "index.js",
-	"name": "rested",
-	"os": ["!win32"],
-	"private": true,
-	"repository": { "git": "git://github.com/whymarrh/rested" },
-	"scripts": { "test": "grunt test" },
+	"name": "mattress",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/whymarrh/mattress.git"
+	},
+	"author": "Whymarrh Whitby",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/whymarrh/mattress/issues"
+	},
+	"homepage": "https://github.com/whymarrh/mattress",
+	"scripts": {
+		"test": "grunt test"
+	},
 	"version": "0.2.0"
 }

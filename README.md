@@ -1,12 +1,14 @@
-Rested [![Build Status](https://travis-ci.org/whymarrh/rested.svg)](https://travis-ci.org/whymarrh/rested)
-======
+Mattress [![Build Status](https://travis-ci.org/whymarrh/mattress.svg)](https://travis-ci.org/whymarrh/mattress)
+========
 
-Rested is a small framework, a foundation if you will, on top of which you can build APIs. Rested is not a web framework, it is an API framework. It was/is based on [restify] and borrows heavily from it, but differs in some aspects. Despite it's name, Rested not will automatically create REST APIs for you &mdash; whether or not your API is actually RESTful depends on you.
+Mattress is a small framework, a foundation if you will, on top of which you can build APIs &ndash; Mattress is not a web framework, it is an API framework. It was and is based on [restify] and borrows heavily from it, but differs in some aspects. Despite it's name, Mattress will not automatically create REST APIs for you. Whether or not your API is actually RESTful depends on you.
 
-Got ideas and/or feature requests? [Please file an issue.](https://github.com/whymarrh/rested/issues)
+Got ideas and/or feature requests? [Please file an issue.](https://github.com/whymarrh/mattress/issues)
 
-Things Rested does
-------------------
+  [restify]:https://github.com/mcavage/node-restify
+
+Things Mattress does
+--------------------
 
 a.k.a features!
 
@@ -23,7 +25,7 @@ A server that simply echos "Hello world." (available as [examples/hello-world.js
 ```js
 "use strict";
 
-var Rested = require("..");
+var Mattress = require("..");
 
 var v1 = {
     "GET":
@@ -37,7 +39,7 @@ var media = {
     "text/plain": { "1": v1 }
 };
 
-Rested
+Mattress
 .createServer({
     "routes": [{
         "path": "/hello",
@@ -78,5 +80,3 @@ License
 -------
 
 This software is released under the ISC License. See [LICENSE.md](LICENSE.md) for more information.
-
-  [restify]:https://github.com/mcavage/node-restify

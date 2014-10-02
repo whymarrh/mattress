@@ -1,6 +1,6 @@
 "use strict";
 
-var Rested = require("..");
+var Mattress = require("..");
 
 var v1 = {
 	"GET":
@@ -14,7 +14,7 @@ var media = {
 	"text/plain": { "1": v1 }
 };
 
-Rested
+Mattress
 .createServer({
 	"routes": [{
 		"path": "/hello",
